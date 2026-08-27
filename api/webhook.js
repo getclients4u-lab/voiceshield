@@ -12,6 +12,19 @@ const GH_REPO = process.env.GH_REPO || 'voiceshield';
 const MAIL_FROM = process.env.VOICESHIELD_MAIL_FROM || 'gentledesk632@agentmail.to';
 const AGENTMAIL_KEY = process.env.AGENTMAIL_API_KEY || '';
 const BUYERS_FILE = 'buyers.json';
+const USERS_FILE = 'users.json';
+const ACCESS_PEPPER = process.env.ACCESS_PEPPER || 'voiceshield-pepper';
+
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 10; i++) s += chars[crypto.randomInt(chars.length)];
+  return `VS-${s.slice(0, 5)}-${s.slice(5)}`;
+}
+
+function hashCode(code) {
+  return crypto.createHash('sha256').update(`${code}::${ACCESS_PEPPER}`).digest('hex');
+}
 
 // Read raw request body as a Buffer (so HMAC over raw bytes works)
 function readRawBody(req) {
@@ -62,7 +75,7 @@ async function addToAllowList(email) {
   } catch (e) { /* best effort */ }
 }
 
-async function sendEmail(buyer) {
+async function sendEmail(buyer, code) {
   if (!AGENTMAIL_KEY || !MAIL_FROM) return false;
   await addToAllowList(buyer.email);
   const body =
@@ -72,8 +85,11 @@ Hi ${buyer.name || 'there'},
 
 Thank you! Your order is confirmed.
 
-DOWNLOAD YOUR SYSTEM:
+YOUR PERSONAL ACCESS CODE: ${code || 'VS-XXXXX-XXXXX'}
+
+OPEN YOUR DOWNLOADS:
 → https://voiceshield-protocol.vercel.app/download.html
+(enter your email + access code above)
 
 WHAT'S INSIDE (8 deliverables):
 • The VoiceShield Protocol™ Core Guide (40+ pages)
@@ -83,6 +99,7 @@ WHAT'S INSIDE (8 deliverables):
 • Voice-Clone Red-Flag Checklist (9 signs)
 • "I Already Sent Money" Recovery Playbook (72-hr)
 • Parent & Grandparent Conversation Guide
+• Bonus: Business Edition
 
 START TONIGHT:
 1. Pick a family safe word (never share it over the phone!)
@@ -124,7 +141,9 @@ export default async function handler(req, res) {
     if (!buyer.email) return res.status(200).json({ received: true, error: 'no email' });
 
     let buyers = [];
-    let stored = false, emailed = false;
+    let users = [];
+    let stored = false, emailed = false, registered = false;
+    let accessCode = null;
     try {
       const existing = await ghGet(BUYERS_FILE);
       if (existing) {
@@ -136,8 +155,40 @@ export default async function handler(req, res) {
         `buyer: ${buyer.email}`);
     } catch (e) { stored = false; }
 
-    emailed = await sendEmail(buyer);
-    return res.status(200).json({ received: true, stored: stored ? 1 : 0, emailed });
+    // Register buyer as product user (personal access code)
+    try {
+      const uExisting = await ghGet(USERS_FILE);
+      if (uExisting) {
+        try { users = JSON.parse(Buffer.from(uExisting.content, 'base64').toString('utf8')); } catch (e) { users = []; }
+        if (!Array.isArray(users)) users = [];
+      }
+      const norm = String(buyer.email).trim().toLowerCase();
+      const existingUser = users.find(u => String(u.email || '').trim().toLowerCase() === norm);
+      if (existingUser && existingUser.status === 'active') {
+        registered = true; // already has access
+      } else {
+        accessCode = genCode();
+        const user = {
+          email: norm,
+          name: buyer.name || norm.split('@')[0],
+          codeHash: hashCode(accessCode),
+          status: 'active',
+          added: new Date().toISOString(),
+          source: 'stripe',
+        };
+        if (existingUser) {
+          const i = users.findIndex(u => String(u.email || '').trim().toLowerCase() === norm);
+          users[i] = user;
+        } else {
+          users.push(user);
+        }
+        registered = await ghPut(USERS_FILE, JSON.stringify(users, null, 2), uExisting ? uExisting.sha : undefined,
+          `user: ${norm}`);
+      }
+    } catch (e) { registered = false; }
+
+    emailed = await sendEmail(buyer, accessCode);
+    return res.status(200).json({ received: true, stored: stored ? 1 : 0, registered: registered ? 1 : 0, emailed });
   }
   return res.status(200).json({ received: true, ignored: event.type });
 }
