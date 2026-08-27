@@ -1,1 +1,10 @@
-{"users":[]}
+[
+  {
+    "email": "heyeverlastingmemories@gmail.com",
+    "name": "Castle",
+    "codeHash": "495dee2775afa7f4a6010ef16ce4a3e6a9747f5018be8297ac703986053252d4",
+    "status": "active",
+    "added": "2026-08-27T10:39:35.800Z",
+    "source": "admin"
+  }
+]
