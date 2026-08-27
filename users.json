@@ -6,14 +6,5 @@
     "status": "active",
     "added": "2026-08-27T10:39:35.800Z",
     "source": "admin"
-  },
-  {
-    "email": "buyer.test.voiceshield@gmail.com",
-    "name": "Test Buyer",
-    "codeHash": "b949b17040413afa436eecf7ebf674c194113ceda83e13c84e6395d50d749414",
-    "status": "disabled",
-    "added": "2026-08-27T10:39:42.515Z",
-    "source": "stripe",
-    "revoked": "2026-08-27T10:39:50.396Z"
   }
 ]
