@@ -73,7 +73,7 @@ Hi ${buyer.name || 'there'},
 Thank you! Your order is confirmed.
 
 DOWNLOAD YOUR SYSTEM:
-→ https://voiceshield-protocol.vercel.app/
+→ https://voiceshield-protocol.vercel.app/download.html
 
 WHAT'S INSIDE (8 deliverables):
 • The VoiceShield Protocol™ Core Guide (40+ pages)
