@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceShield — Stop AI Voice-Clone Scammers Before They Touch Your Money</title>
+<meta name="description" content="The VoiceShield Protocol™ is a 4-step verbal verification system that stops AI voice-cloning scammers — even when they sound exactly like your family.">
+<style>
+  :root {
+    --ink: #0e1116;
+    --muted: #4b5563;
+    --accent: #d92d20;
+    --accent-soft: #fee4e2;
+    --green: #027a48;
+    --green-soft: #e6f4ea;
+    --gold: #b45309;
+    --gold-soft: #fef3c7;
+    --line: #e5e7eb;
+    --bg: #ffffff;
+    --bg-alt: #f8fafc;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 48px 0; }
+  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+  h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; }
+  h2 { font-size: clamp(24px, 4vw, 34px); font-weight: 800; margin-bottom: 20px; }
+  h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  p { margin-bottom: 16px; font-size: 17px; color: #1f2937; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+  .center { text-align: center; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(180deg, #0e1116 0%, #1a1f2b 100%);
+    color: #fff;
+    padding: 72px 0 56px;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    display: inline-block;
+    background: rgba(217,45,32,0.18);
+    color: #fca5a5;
+    border: 1px solid rgba(217,45,32,0.4);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero h1 { color: #fff; margin-bottom: 18px; }
+  .hero h1 .red { color: #f87171; }
+  .hero .sub {
+    font-size: 19px;
+    color: #cbd5e1;
+    max-width: 620px;
+    margin: 0 auto 28px;
+  }
+  .stat-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 28px 0;
+  }
+  .stat {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 14px 18px;
+    min-width: 150px;
+  }
+  .stat .n { font-size: 22px; font-weight: 800; color: #fca5a5; }
+  .stat .l { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 18px;
+    padding: 16px 40px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease;
+    box-shadow: 0 6px 20px rgba(217,45,32,0.35);
+  }
+  .btn:hover { background: #b91c1c; transform: translateY(-1px); }
+  .btn.block { display: block; width: 100%; text-align: center; }
+  .micro { font-size: 13px; color: #94a3b8; margin-top: 14px; }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .box { border-radius: 14px; padding: 28px; margin: 20px 0; }
+  .box.red { background: var(--accent-soft); border: 1px solid #fecaca; }
+  .box.green { background: var(--green-soft); border: 1px solid #b7e4c7; }
+  .box.gold { background: var(--gold-soft); border: 1px solid #fde68a; }
+
+  .list { list-style: none; }
+  .list li {
+    padding: 10px 0 10px 32px;
+    position: relative;
+    font-size: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .list li:last-child { border-bottom: none; }
+  .list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    color: var(--green);
+    font-weight: 800;
+  }
+  .list.x li::before { content: "✕"; color: var(--accent); }
+
+  .steps { counter-reset: step; list-style: none; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 20px 0 20px 60px;
+    border-bottom: 1px solid var(--line);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 16px;
+    width: 40px; height: 40px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px;
+  }
+  .steps li strong { display: block; font-size: 18px; margin-bottom: 4px; }
+
+  .price-row { display: flex; align-items: baseline; gap: 12px; justify-content: center; }
+  .price-now { font-size: 52px; font-weight: 900; color: var(--green); }
+  .price-was { font-size: 22px; color: #9ca3af; text-decoration: line-through; }
+
+  .guarantee {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: var(--bg-alt); border: 1px solid var(--line);
+    border-radius: 14px; padding: 24px;
+  }
+  .guarantee .seal { font-size: 40px; line-height: 1; }
+
+  .faq { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .faq details { border-bottom: 1px solid var(--line); padding: 18px 24px; }
+  .faq details:last-child { border-bottom: none; }
+  .faq summary { font-weight: 700; cursor: pointer; font-size: 16px; }
+  .faq details p { margin-top: 10px; font-size: 15px; color: var(--muted); }
+
+  .footer { background: var(--ink); color: #94a3b8; padding: 40px 0; text-align: center; font-size: 13px; }
+  .divider { height: 1px; background: var(--line); margin: 0; border: none; }
+
+  @media (max-width: 520px) {
+    .stat { min-width: 130px; padding: 12px 14px; }
+    .stat .n { font-size: 18px; }
+    section { padding: 36px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">⚠️ FBI: $893M lost to AI scams in 2025</span>
+    <h1>They Cloned Your Mom's Voice In <span class="red">3 Seconds.</span><br>Now They're Calling You For Money.</h1>
+    <p class="sub">A scammer doesn't need to hack your account. They just need a 3-second clip of a loved one's voice — and a phone call to you. <strong>The VoiceShield Protocol™ is the 4-step verbal firewall that stops them cold.</strong></p>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n">$893M</div><div class="l">FBI-reported AI scam losses (2025)</div></div>
+      <div class="stat"><div class="n">3 sec</div><div class="l">audio needed to clone a voice</div></div>
+      <div class="stat"><div class="n">1,210%</div><div class="l">surge in AI voice fraud</div></div>
+      <div class="stat"><div class="n">$40B</div><div class="l">projected fraud by 2027</div></div>
+    </div>
+
+    <a href="#buy" class="btn">Get The VoiceShield Protocol™ → $27</a>
+    <p class="micro">Instant download · 30-day "Sleep Easy" guarantee · No software to install</p>
+  </div>
+</header>
+
+<!-- ============ OPENING SCENARIO ============ -->
+<section>
+  <div class="wrap">
+    <h2>It's 9:47 PM. Your Phone Rings. It's Your Daughter.</h2>
+    <p>"Dad, I'm in trouble. I was in an accident and I need $4,000 wired to a bail bondsman right now. Please don't call Mom — she'll worry. Just send it."</p>
+    <p>Her voice cracks exactly where it always cracks. The cadence is hers. The little laugh at the end? Hers. You'd swear on your life it's your daughter.</p>
+    <p><strong>It's not.</strong></p>
+    <p>It's a voice clone — generated from a 3-second clip she posted on TikTok three weeks ago. And thousands of people just like you are wiring money to a stranger right now, because <em>the one thing you trust most — a familiar voice — has been weaponized against you.</em></p>
+
+    <div class="box red">
+      <p style="margin-bottom:0"><strong>Here's the part nobody tells you:</strong> This isn't a "be careful on the internet" problem. You don't have to click a bad link, open a phishing email, or fall for anything. All you have to do is <em>answer the phone</em>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM EXPANSION ============ -->
+<section style="background: var(--bg-alt)">
+  <div class="wrap">
+    <h2>Why "Just Be Careful" Doesn't Work Anymore</h2>
+    <p>Every piece of advice you've heard is built for the old world — a world where scammers had foreign accents, broken English, and awkward phrasing. That world is gone.</p>
+    <p>In 2026, a scammer can:</p>
+    <ul class="list x">
+      <li>Clone any voice from a 3-second social media clip, voicemail greeting, or YouTube video</li>
+      <li>Match the exact emotional tone — panic, tears, urgency — to bypass your logic</li>
+      <li>Spoof the caller ID so it shows your daughter's real number</li>
+      <li>Generate a convincing "accident," "kidnapping," or "arrest" story in seconds</li>
+      <li>Pressure you to act fast so you never stop to verify</li>
+    </ul>
+    <p>Your brain is hardwired to trust a familiar voice. That's the vulnerability. The scammers know it. They're exploiting it at scale — <strong>the FBI logged $893 million in AI-scam losses in 2025, the first time AI fraud got its own category in federal crime history.</strong></p>
+
+    <div class="box gold">
+      <p style="margin-bottom:0"><strong>💡 The uncomfortable truth:</strong> The scammer isn't hacking your computer. They're hacking <em>your love for your family</em>. That's why "be careful" fails — because in the moment, caution feels like betrayal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE MECHANISM ============ -->
+<section>
+  <div class="wrap">
+    <h2>Introducing The VoiceShield Protocol™</h2>
+    <p style="font-size:19px"><strong>The 4-step verbal firewall that stops a voice-clone scammer — even when they sound 100% identical to your family.</strong></p>
+
+    <p>Here's the breakthrough insight most people miss: <strong>a voice clone can copy the <em>sound</em> of a loved one's voice, but it can never copy the <em>secret shared knowledge</em> only your family has.</strong></p>
+    <p>The VoiceShield Protocol™ turns that gap into an unbreakable lock. It's not software. It's not an app. It's a simple, repeatable system of verbal challenges — a "two-factor authentication" made of words — that exposes a clone in seconds.</p>
+
+    <ol class="steps">
+      <li><strong>Step 1 — Establish (The Safe Word)</strong>
+        Create a family "safe word" + a set of "shared secret" questions that only the real person could answer. No safe word? The call is already suspect.</li>
+      <li><strong>Step 2 — Verify (The Challenge)</strong>
+        Before any money, any info, any "please don't tell Mom" — issue a verbal challenge only your real loved one can pass.</li>
+      <li><strong>Step 3 — Challenge (The Bait Question)</strong>
+        Ask a question with a deliberately wrong answer. A real person corrects you instantly. A clone agrees with whatever you say.</li>
+      <li><strong>Step 4 — Escalate (The Hang-Up)</strong>
+        A single scripted sentence that ends the call and reroutes verification through a channel a clone can't reach — a live video call.</li>
+    </ol>
+
+    <div class="box green">
+      <p style="margin-bottom:0"><strong>Why it works:</strong> A voice clone is audio only. It can't do a live FaceTime. It can't know your family's private safe word. It can't correct a deliberately wrong "bait" statement. The moment you apply the Protocol, the clone's entire advantage collapses.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT YOU GET ============ -->
+<section style="background: var(--bg-alt)">
+  <div class="wrap">
+    <h2>Here's Exactly What You Get</h2>
+    <div class="card">
+      <ul class="list">
+        <li><strong>The VoiceShield Protocol™ Core Guide</strong> — the complete 4-step system, explained in plain English, readable in 30 minutes (PDF, 40+ pages)</li>
+        <li><strong>The Family Safe-Word Builder</strong> — a fill-in-the-blank worksheet to set up your family's secret challenges in one sitting</li>
+        <li><strong>3 "Bait Question" Scripts</strong> — word-for-word challenges that expose a clone in under 15 seconds</li>
+        <li><strong>The Hang-Up Script</strong> — the exact calm, firm sentence to say when a call turns suspicious (with the emotional script for saying it to "family")</li>
+        <li><strong>Voice-Clone Red-Flag Checklist</strong> — the 9 warning signs a call is AI-generated, printable for your fridge</li>
+        <li><strong>The "I Already Sent Money" Recovery Playbook</strong> — the immediate 72-hour action plan to freeze transfers and report fraud</li>
+        <li><strong>Parent & Grandparent Conversation Guide</strong> — how to protect the most-targeted generation without scaring them into silence</li>
+        <li><strong>Bonus: Business Edition</strong> — the same Protocol adapted for wire-transfer, payroll, and "CEO fraud" calls targeting companies</li>
+      </ul>
+    </div>
+    <p class="small muted center" style="margin-top:14px">Total value: $67. Today: <strong>$27</strong>.</p>
+  </div>
+</section>
+
+<!-- ============ PROOF / VALIDATION ============ -->
+<section>
+  <div class="wrap">
+    <h2>Why This Works (The Logic No One Can Argue With)</h2>
+    <p>You don't have to take our word for it. The math is brutal and simple:</p>
+    <ul class="list">
+      <li><strong>Voice cloning is now trivial</strong> — free tools can clone a voice from 3 seconds of audio. The FBI has explicitly warned the public about this in 2025 and 2026.</li>
+      <li><strong>Fraud is exploding</strong> — AI voice fraud is up 1,210%, and analysts project $40 billion in AI-enabled fraud by 2027.</li>
+      <li><strong>The only un-cloneable asset is shared secrets</strong> — a clone copies sound, not private knowledge. The Protocol exploits exactly this gap.</li>
+      <li><strong>No dependence on you being "savvy"</strong> — the Protocol works even when you're scared, tired, or emotionally flooded, because it's a checklist, not a judgment call.</li>
+    </ul>
+
+    <div class="box red">
+      <p style="margin-bottom:0"><strong>The stakes, stated plainly:</strong> One successful scam averages far more than the cost of this guide. If the Protocol stops <em>one</em> fraudulent wire, it has paid for itself hundreds of times over. If it stops a scam on your <em>parents</em>, it's priceless.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OBJECTION HANDLING ============ -->
+<section style="background: var(--bg-alt)">
+  <div class="wrap">
+    <h2>What You Might Be Thinking</h2>
+    <div class="faq">
+      <details open>
+        <summary>"I'm not technical. Will I be able to do this?"</summary>
+        <p>Yes. This is deliberately low-tech. If you can make a phone call and remember a safe word, you can run the entire Protocol. There's no software, no app, no dashboard. It's a 30-minute read and a one-time family conversation.</p>
+      </details>
+      <details>
+        <summary>"Won't this make me look paranoid to my own family?"</summary>
+        <p>The Conversation Guide shows you exactly how to frame it — not as fear, but as love. "We're setting a safe word so that if you ever really need me, I can tell it's you." That framing lands every time. Real family members will thank you.</p>
+      </details>
+      <details>
+        <summary>"I don't have a lot of money. Am I even a target?"</summary>
+        <p>Scammers don't only target the wealthy — they target the <em>reachable</em>. Seniors, busy parents, and anyone who answers the phone is a target. The average victim loses thousands, not millions. Protecting a modest account matters just as much.</p>
+      </details>
+      <details>
+        <summary>"Isn't there an app for this already?"</summary>
+        <p>There are detection apps, but they're reactive, imperfect, and fail the moment the call is live. The Protocol is proactive and can't be beaten by a better voice model — because it doesn't rely on detecting the audio at all. It relies on knowledge only your family shares.</p>
+      </details>
+      <details>
+        <summary>"Why is it only $27? Is this a cheap product?"</summary>
+        <p>It's priced to remove every excuse not to protect your family. A high price tag shouldn't be the reason someone stays vulnerable. $27 is less than a family pizza — and it could save your parents their entire savings.</p>
+      </details>
+      <details>
+        <summary>"What if it doesn't work?"</summary>
+        <p>Then you get every penny back. The 30-day "Sleep Easy" guarantee means you can read it, set up your family's safe word, and decide with zero risk. If you're not confident, one email refunds you in full.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRANSFORMATION ============ -->
+<section>
+  <div class="wrap">
+    <h2>Imagine This</h2>
+    <p>It's 9:47 PM again. Your phone rings. It's your daughter's number. Her voice — cracked with panic — tells you she's in trouble and needs $4,000 wired immediately.</p>
+    <p>But this time, your heart stays steady. Because you have a system. You ask the one question only your real daughter could answer.</p>
+    <p>The line goes silent for half a second too long.</p>
+    <p>Then a click.</p>
+    <p>And you hang up — <strong>not with fear, but with the calm certainty that you just stopped a scammer in their tracks.</strong> You call your real daughter on FaceTime. She's fine. She was watching a movie.</p>
+    <p>That's the difference between feeling helpless and feeling <em>protected</em>. That's what The VoiceShield Protocol™ gives you.</p>
+
+    <div class="box green">
+      <p style="margin-bottom:0;font-size:18px"><strong>This isn't about paranoia. It's about peace.</strong> The peace of knowing that no matter how good voice cloning gets, your family has a lock the machines can't pick.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OFFER / BUY ============ -->
+<section id="buy" style="background: var(--bg-alt)">
+  <div class="wrap">
+    <h2 class="center">Protect Your Family Tonight</h2>
+    <p class="center muted">Full system + 8 deliverables. Instant download. Yours in the next 60 seconds.</p>
+
+    <div class="card" style="max-width:520px;margin:24px auto;">
+      <div class="center">
+        <p class="small muted" style="margin-bottom:4px">TOTAL VALUE</p>
+        <p class="price-row"><span class="price-was">$67</span><span class="price-now">$27</span></p>
+        <p class="small muted" style="margin:8px 0 20px">One-time payment · Lifetime access · Free updates</p>
+        <a href="#" class="btn block">Get Instant Access →</a>
+        <p class="micro">🔒 Secure checkout · 256-bit encryption · Instant PDF download</p>
+      </div>
+    </div>
+
+    <div class="guarantee" style="max-width:520px;margin:24px auto;">
+      <div class="seal">🛡️</div>
+      <div>
+        <strong style="font-size:18px">The 30-Day "Sleep Easy" Guarantee</strong>
+        <p style="margin:8px 0 0;font-size:15px" class="muted">Read the whole system. Set up your family safe word. Run a practice challenge. If you don't feel genuinely more protected within 30 days, reply to your receipt email and get a full refund. No questions, no hoops. The risk is entirely on us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ URGENCY ============ -->
+<section>
+  <div class="wrap">
+    <div class="box gold">
+      <p style="margin-bottom:0"><strong>⏳ A word on urgency — the honest kind.</strong> We're not going to tell you the price goes up in 24 hours, because this isn't a countdown timer gimmick. The real urgency is this: <strong>voice-clone scams are running 24/7, and the scammers get better every single week.</strong> Every day you wait is a day a call could catch your family off guard. The best time to install the Protocol was yesterday. The second-best time is tonight.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section style="background: var(--bg-alt)">
+  <div class="wrap center">
+    <h2>Don't Let A 3-Second Clip Cost You Everything</h2>
+    <p style="max-width:560px;margin:0 auto 24px">Your family's voice is their most trusted signature — and it's already out there, in a voicemail greeting, a social clip, a birthday video. The question isn't <em>whether</em> a scammer will try to use it. It's whether you'll have a lock in place when they do.</p>
+    <a href="#buy" class="btn">Yes — Give Me The VoiceShield Protocol™ →</a>
+    <p class="micro">$27 · Instant download · 30-day guarantee</p>
+  </div>
+</section>
+
+<div class="footer">
+  <div class="wrap">
+    <p>© 2026 VoiceShield. All rights reserved.</p>
+    <p style="margin-top:8px">VoiceShield provides educational security guidance, not legal or financial advice. Statistics cited from FBI IC3 2025 reports and public 2025–2026 fraud research. Individual results vary.</p>
+    <p style="margin-top:8px"><a href="#" style="color:#64748b">Privacy</a> · <a href="#" style="color:#64748b">Terms</a> · <a href="#" style="color:#64748b">Contact</a></p>
+  </div>
+</div>
+
+</body>
+</html>
