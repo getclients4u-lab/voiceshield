@@ -1,11 +1,1 @@
-[
-  {
-    "id": "cs_vs_test001",
-    "email": "heyeverlastingmemories@gmail.com",
-    "name": "Test Buyer",
-    "amount": 27,
-    "currency": "usd",
-    "product": "voiceshield",
-    "ts": "2026-08-27T10:32:37.349Z"
-  }
-]
+{"buyers":[]}
