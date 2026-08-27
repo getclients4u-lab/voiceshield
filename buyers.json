@@ -1,1 +1,11 @@
-{"buyers":[]}
+[
+  {
+    "id": "cs_vs_user001",
+    "email": "buyer.test.voiceshield@gmail.com",
+    "name": "Test Buyer",
+    "amount": 27,
+    "currency": "usd",
+    "product": "voiceshield",
+    "ts": "2026-08-27T10:39:41.596Z"
+  }
+]
