@@ -1,77 +1,121 @@
 # 🛡️ VoiceShield — The VoiceShield Protocol™
 
-**Daily build · 2026-08-27 · Nightly digital-business builder**
+**AI voice-clone scam defense.** A 4-step verbal firewall (Establish → Verify → Challenge → Escalate) that protects families and businesses from deepfake audio fraud.
+
+**Live:** https://voiceshield-protocol.vercel.app/
+**Buyers' download page:** https://voiceshield-protocol.vercel.app/download.html
+**Repo:** https://github.com/getclients4u-lab/voiceshield
 
 ---
 
-## 📈 The Niche Found
-
-**AI voice-cloning scam defense** (deepfake audio fraud protection).
-
-A scammer can now clone any voice from a 3-second audio clip — a TikTok video, a voicemail greeting, a birthday video — then spoof the caller ID and place a panic-inducing call ("Dad, I'm in trouble, send money"). This is the fastest-growing consumer-security threat of 2026:
-
-- **$893M** — FBI IC3 reported AI-scam losses in 2025, the *first time* AI fraud got its own category in federal crime history
-- **3 seconds** — audio required to clone a voice
-- **1,210%** — surge in AI voice fraud
-- **$40B** — projected AI-enabled fraud by 2027
-
-The killer insight: a voice clone can copy the **sound** of a loved one, but never the **shared secret knowledge** only family members have. That gap is the entire product.
-
----
-
-## 🏢 The Business
-
-- **Brand:** VoiceShield
-- **Product:** The VoiceShield Protocol™ — a 4-step verbal firewall (Establish → Verify → Challenge → Escalate)
-- **Price:** $27 one-time (value $67)
-- **Guarantee:** 30-Day "Sleep Easy" Guarantee
-- **Target:** Adults 35–65 with aging parents + small business owners
-- **Budget spent:** $0 (fully in-house, no paid APIs needed)
-
-**Core mechanism:** Voice cloning copies audio, not shared secrets. The Protocol installs a family "safe word" + "bait questions" + a hang-up script that a clone can never pass — because a clone can't do a live FaceTime, can't know your private safe word, and can't correct a deliberately wrong statement.
-
-**Deliverables (8):**
-1. Core Guide (40+ page PDF)
-2. Family Safe-Word Builder
-3. 3 "Bait Question" Scripts
-4. The Hang-Up Script
-5. Voice-Clone Red-Flag Checklist (9 signs)
-6. "I Already Sent Money" Recovery Playbook (72-hr)
-7. Parent & Grandparent Conversation Guide
-8. Bonus: Business Edition (wire-transfer / CEO fraud)
-
----
-
-## 🗂 What's In This Folder
+## 🏗️ Project Architecture
 
 ```
-daily-builds/2026-08-27/
-├── README.md                     ← this file
-├── landing/
-│   └── index.html                ← long-form conversion page (2,900+ words)
-├── emails/
-│   └── launch-emails.md          ← 3-email launch sequence (teaser/launch/follow-up)
-├── vsl/
-│   ├── vsl-script.txt            ← full 5.5-min VSL script + storyboard (51 slides)
-│   ├── vsl-slideshow.mp4         ← silent UPPERCASE slide render (no TTS key)
-│   ├── render_slides.sh          ← slide/slideshow generator (ImageMagick + FFmpeg)
-│   └── slides/                   ← 52 rendered PNG slides
-└── assets/                       ← (reserved for future assets)
+voiceshield/
+├── index.html            # Sales/landing page (3 buy buttons → Stripe payment link)
+├── download.html         # Gated member downloads (email + access code)
+├── thank-you.html        # Post-purchase confirmation page
+├── product/              # The actual product — 8 PDF deliverables
+│   ├── core-guide.pdf            # Main manual (40+ pg, 8 parts)
+│   ├── safe-word-builder.pdf     # Worksheet
+│   ├── bait-question-scripts.pdf
+│   ├── hangup-script.pdf
+│   ├── red-flag-checklist.pdf    # 9 signs, fridge printable
+│   ├── recovery-playbook.pdf     # 72-hr action plan
+│   ├── conversation-guide.pdf    # For parents/grandparents
+│   └── business-edition.pdf      # CEO-fraud defense
+├── api/
+│   ├── webhook.js        # Stripe webhook → buyers.json + auto-register user + email
+│   ├── verify.js         # POST {email, code} → grants download access
+│   └── admin.js          # Admin: add / revoke / list users
+├── buyers.json           # Purchase records (GitHub-hosted DB)
+├── users.json            # User registry — access codes stored SHA-256 hashed
+├── vsl-video.mp4         # 4-min VSL slideshow
+└── launch-emails.md      # 3-email launch sequence
 ```
 
 ---
 
-## 📣 The Hook
+## 🔗 GitHub Setup
 
-> "They cloned your mom's voice in 3 seconds. Now they're calling you for money."
+- **Repo:** `getclients4u-lab/voiceshield` (master branch)
+- Every push to master **auto-deploys to Vercel** (git integration).
+- `buyers.json` / `users.json` are GitHub-hosted JSON "databases" — free,
+  versioned, queryable via the GitHub API.
 
-The single line that sells it: **"A clone copies the sound. It can't copy the secret."**
+## ▲ Vercel Setup
+
+- **Project:** `voiceshield` — linked to GitHub, production branch `master`
+- **Domain:** `voiceshield-protocol.vercel.app` (canonical alias)
+- **Env vars (production):**
+
+| Key | Purpose |
+|---|---|
+| `STRIPE_WEBHOOK_SECRET` | HMAC verification of Stripe events |
+| `GH_TOKEN` | GitHub API (buyers.json / users.json reads+writes) |
+| `GH_OWNER` / `GH_REPO` | `getclients4u-lab` / `voiceshield` |
+| `AGENTMAIL_API_KEY` | Confirmation emails |
+| `VOICESHIELD_MAIL_FROM` | Sender inbox (`gentledesk632@agentmail.to`) |
+| `ADMIN_PASSWORD` | Admin API auth |
+| `ACCESS_PEPPER` | Salt for access-code hashing |
+
+## 💳 Stripe Setup (test mode)
+
+- **Product:** `prod_V9JBRDj25Xwx4Y` — The VoiceShield Protocol, $27 one-time
+- **Price:** `price_1U90ZSLJy1J1wtNpP2h9NHEo`
+- **Payment link:** https://buy.stripe.com/test_eVq00kdrq1gL8TJal91Nu0e
+  → redirects to `/thank-you.html` after payment
+- **Webhook:** `we_1U90ZwLJy1J1wtNp2Oc0r8C2` → `POST /api/webhook`
+  (event: `checkout.session.completed`)
+
+## 👥 User Management
+
+Buyers **auto-register** on purchase: the webhook generates a personal
+access code (e.g. `VS-FNBFQ-49LG8`), stores it hashed in `users.json`, and
+emails it to the buyer. The download page requires email + code.
+
+### Admin API
+
+```
+# Add a user (returns their access code):
+curl -X POST https://voiceshield-protocol.vercel.app/api/admin \
+  -H "Content-Type: application/json" \
+  -d '{"password":"<ADMIN_PASSWORD>","action":"add","email":"friend@email.com","name":"Friend"}'
+
+# Revoke access:
+curl -X POST .../api/admin -d '{"password":"...","action":"revoke","email":"friend@email.com"}'
+
+# List users:
+curl -X POST .../api/admin -d '{"password":"...","action":"list"}'
+```
+
+### Verify API (used by the download page)
+
+```
+POST /api/verify  {"email":"...","code":"VS-XXXXX-XXXXX"} → {ok:true,name} | 403
+```
 
 ---
 
-## 🔧 Notes / Lessons
+## 🔄 Purchase Flow (end-to-end)
 
-- No ElevenLabs / YouTube / Twitter / LLM keys in `.creds` — VSL shipped as script + storyboard + silent slideshow (ImageMagick + FFmpeg, zero API cost).
-- Landing page is a static HTML file (self-contained CSS, no external deps, loads offline).
-- CTA links use `#buy` placeholder — swap for real checkout link before launch.
-- Stats sourced from FBI IC3 2025 + public 2025–2026 fraud research (Eyesift, Axis Intelligence, TheWorldData).
+1. Buyer clicks a buy button → Stripe payment link
+2. Pays $27 (test mode) → redirected to `/thank-you.html`
+3. Stripe fires `checkout.session.completed` → `/api/webhook`
+4. Webhook: appends to `buyers.json` + registers user in `users.json`
+   (generates hashed access code) + emails buyer their code & download link
+5. Buyer opens `/download.html`, enters email + code → downloads all 8 PDFs
+
+**Verified live:** `{received:true, stored:1, registered:1, emailed:true}`
+
+---
+
+## ⚠️ Go-Live Checklist (real money)
+
+- [ ] Replace Stripe keys with **live** (`sk_live_` / `pk_live_`)
+- [ ] Recreate product + payment link + webhook in live mode
+- [ ] Update buy-button URLs on `index.html`
+- [ ] Update `STRIPE_WEBHOOK_SECRET` env var
+- [ ] Test a real purchase end-to-end
+
+© 2026 VoiceShield. All rights reserved.
