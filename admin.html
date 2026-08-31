@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceShield Admin</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0b1220; color:#e2e8f0; min-height:100vh; padding:40px 20px; }
+  .wrap { max-width:760px; margin:0 auto; }
+  h1 { font-size:24px; color:#fff; margin-bottom:4px; }
+  .sub { color:#94a3b8; font-size:14px; margin-bottom:28px; }
+  .card { background:#111a2e; border:1px solid #1e2a45; border-radius:14px; padding:22px; margin-bottom:18px; }
+  .card h2 { color:#fff; font-size:16px; margin-bottom:14px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  input, select { background:#0d1526; border:1px solid #1e2a45; border-radius:8px; color:#fff; font-size:14px; padding:11px 14px; flex:1; min-width:160px; }
+  .btn { background:linear-gradient(135deg,#38bdf8,#2563eb); color:#fff; font-weight:700; font-size:14px; padding:11px 20px; border-radius:8px; border:none; cursor:pointer; }
+  .btn.danger { background:linear-gradient(135deg,#f87171,#dc2626); }
+  .btn.ghost { background:transparent; border:1px solid #1e2a45; color:#94a3b8; }
+  .msg { font-size:13px; margin-top:10px; min-height:18px; }
+  .msg.ok { color:#4ade80; } .msg.err { color:#f87171; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; color:#64748b; font-weight:600; padding:8px 6px; border-bottom:1px solid #1e2a45; }
+  td { padding:8px 6px; border-bottom:1px solid #141f38; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+  .tag.active { background:#052e16; color:#4ade80; border:1px solid #166534; }
+  .tag.disabled { background:#2a0a0a; color:#f87171; border:1px solid #7f1d1d; }
+  .revoke { color:#f87171; cursor:pointer; font-size:12px; text-decoration:underline; background:none; border:none; }
+  .codebox { background:#0d1526; border:1px solid #1e2a45; border-radius:8px; padding:12px 14px; font-family:monospace; font-size:14px; color:#4ade80; margin-top:8px; }
+  .lock { display:flex; align-items:center; justify-content:center; min-height:60vh; }
+  .lock .card { width:100%; max-width:400px; text-align:center; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOCK SCREEN -->
+  <div class="lock" id="lock">
+    <div class="card">
+      <h2>🔐 Admin Login</h2>
+      <p class="sub" style="margin-bottom:18px">Enter the admin password to manage users.</p>
+      <input type="password" id="pw" placeholder="Admin password" style="margin-bottom:12px; text-align:center">
+      <button class="btn" id="loginBtn" style="width:100%">Unlock</button>
+      <div class="msg err" id="lockMsg"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" class="hidden">
+    <h1>🛡️ VoiceShield — Admin</h1>
+    <p class="sub">Manage who can access the product. Codes are hashed; only you see them once.</p>
+
+    <div class="card">
+      <h2>➕ Add User</h2>
+      <div class="row">
+        <input type="email" id="newEmail" placeholder="buyer@email.com">
+        <input type="text" id="newName" placeholder="Name (optional)">
+        <button class="btn" id="addBtn">Add User</button>
+      </div>
+      <div class="msg" id="addMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>👥 Users ({{count}})</h2>
+      <table>
+        <thead><tr><th>Email</th><th>Name</th><th>Status</th><th>Source</th><th>Added</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="msg" id="listMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PW_KEY = 'vs_admin_pw';
+let pw = sessionStorage.getItem(PW_KEY) || '';
+
+function show(sel) { document.querySelectorAll('#lock,#dash').forEach(e => e.classList.add('hidden')); document.querySelector(sel).classList.remove('hidden'); }
+function msg(el, text, ok) { const m = document.getElementById(el); m.textContent = text; m.className = 'msg ' + (ok ? 'ok' : 'err'); }
+
+async function api(body) {
+  const r = await fetch('/api/admin', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw, ...body }) });
+  return { status: r.status, data: await r.json() };
+}
+
+function fmtDate(iso) { return iso ? new Date(iso).toISOString().slice(0,16).replace('T',' ') : ''; }
+
+async function loadUsers() {
+  const { status, data } = await api({ action:'list' });
+  if (status !== 200 || !data.ok) { msg('listMsg', data.error || 'Failed to load users', false); return; }
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = '';
+  document.querySelector('#dash h1').textContent = `🛡️ VoiceShield — Admin (${data.users.length} users)`;
+  data.users.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${u.email}</td><td>${u.name || '—'}</td>
+      <td><span class="tag ${u.status}">${u.status}</span></td>
+      <td>${u.source || '—'}</td><td>${fmtDate(u.added)}</td>
+      <td>${u.status === 'active' ? '<button class="revoke" data-email="'+u.email+'">revoke</button>' : ''}</td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('.revoke').forEach(b => b.addEventListener('click', async () => {
+    const { status, data } = await api({ action:'revoke', email: b.dataset.email });
+    msg('listMsg', data.ok ? `Revoked ${b.dataset.email}` : data.error, data.ok);
+    loadUsers();
+  }));
+}
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  pw = document.getElementById('pw').value.trim();
+  const { status, data } = await api({ action:'list' });
+  if (status === 200 && data.ok) {
+    sessionStorage.setItem(PW_KEY, pw);
+    show('#dash');
+    loadUsers();
+  } else {
+    msg('lockMsg', 'Wrong password', false);
+  }
+});
+
+document.getElementById('addBtn').addEventListener('click', async () => {
+  const email = document.getElementById('newEmail').value.trim();
+  const name = document.getElementById('newName').value.trim();
+  if (!email) { msg('addMsg', 'Email required', false); return; }
+  const { status, data } = await api({ action:'add', email, name });
+  if (status === 200 && data.ok) {
+    if (data.code) {
+      document.getElementById('addMsg').innerHTML = '';
+      const box = document.createElement('div');
+      box.className = 'codebox';
+      box.textContent = `🔑 ${data.email} → access code: ${data.code}`;
+      document.getElementById('addMsg').appendChild(box);
+      msg('addMsg', 'User added. Code shown once — send it to them.', true);
+    } else {
+      msg('addMsg', `${data.email} already has active access`, true);
+    }
+    document.getElementById('newEmail').value = '';
+    document.getElementById('newName').value = '';
+    loadUsers();
+  } else {
+    msg('addMsg', data.error || 'Failed', false);
+  }
+});
+
+// Enter key on password field
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+// Auto-login if session has pw
+if (pw) { (async () => { const { status, data } = await api({ action:'list' }); if (status === 200 && data.ok) { show('#dash'); loadUsers(); } })(); }
+</script>
+</body>
+</html>
