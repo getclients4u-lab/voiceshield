@@ -6,7 +6,7 @@ export const config = { api: { bodyParser: true } };
 
 const GH_TOKEN = process.env.GH_TOKEN || '';
 const GH_OWNER = process.env.GH_OWNER || 'getclients4u-lab';
-const GH_REPO = process.env.GH_REPO || 'voiceshield';
+const GH_REPO = process.env.GH_DATA_REPO || 'voiceshield-data';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const PEPPER = process.env.ACCESS_PEPPER || 'voiceshield-pepper';
 

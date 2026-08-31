@@ -45,35 +45,35 @@
   <div id="downloads" class="hidden">
     <div class="card">
       <div><h3>📘 The VoiceShield Protocol™ Core Guide</h3><p>The complete 4-step system — Establish, Verify, Challenge, Escalate. Start here.</p></div>
-      <a class="btn" href="product/core-guide.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('core-guide.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>📝 Family Safe-Word Builder</h3><p>Worksheet: choose your safe word, bait questions &amp; hang-up script together.</p></div>
-      <a class="btn" href="product/safe-word-builder.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('safe-word-builder.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>🎭 The 3 Bait Question Scripts</h3><p>Ready-to-use scripts only your family can answer. Clone-proof by design.</p></div>
-      <a class="btn" href="product/bait-question-scripts.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('bait-question-scripts.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>📞 The Hang-Up Script</h3><p>Print by every phone. The exact words to end a scam call in 10 seconds.</p></div>
-      <a class="btn" href="product/hangup-script.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('hangup-script.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>🚩 Voice-Clone Red-Flag Checklist</h3><p>The 9 warning signs — printable for the fridge.</p></div>
-      <a class="btn" href="product/red-flag-checklist.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('red-flag-checklist.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>💸 "I Already Sent Money" Recovery Playbook</h3><p>The 72-hour action plan: freeze, document, report, escalate.</p></div>
-      <a class="btn" href="product/recovery-playbook.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('recovery-playbook.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>👵 Parent &amp; Grandparent Conversation Guide</h3><p>Protect the most-targeted generation without scaring them into silence.</p></div>
-      <a class="btn" href="product/conversation-guide.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('conversation-guide.pdf')">Download PDF</button>
     </div>
     <div class="card">
       <div><h3>🏢 Bonus: The Business Edition</h3><p>CEO-fraud defense — wire-transfer protection for companies.</p></div>
-      <a class="btn" href="product/business-edition.pdf" download>Download PDF</a>
+      <button class="btn" onclick="dl('business-edition.pdf')">Download PDF</button>
     </div>
     <div class="steps">
       <strong>Your 3 steps tonight:</strong>
@@ -107,6 +107,8 @@
       if (d.ok) {
         gate.classList.add('hidden');
         downloads.classList.remove('hidden');
+        sessionStorage.setItem('vs_email', email);
+        sessionStorage.setItem('vs_code', code);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         err.textContent = d.error || 'Access denied. Check your code and email.';
@@ -118,6 +120,28 @@
   // Enter key submits
   document.getElementById('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('unlock').click(); });
   document.getElementById('email').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('unlock').click(); });
+
+  async function dl(file) {
+    const email = sessionStorage.getItem('vs_email');
+    const code = sessionStorage.getItem('vs_code');
+    if (!email || !code) { alert('Session expired — please unlock again.'); location.reload(); return; }
+    const btn = event.target; const old = btn.textContent;
+    btn.textContent = 'Preparing…'; btn.disabled = true;
+    try {
+      const r = await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, file }),
+      });
+      if (!r.ok) { const d = await r.json().catch(()=>({})); alert(d.error || 'Download failed'); btn.textContent = old; btn.disabled = false; return; }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = file; document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+      btn.textContent = old; btn.disabled = false;
+    } catch (e) { alert('Network error'); btn.textContent = old; btn.disabled = false; }
+  }
 </script>
 </body>
 </html>
